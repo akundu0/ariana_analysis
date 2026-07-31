@@ -252,14 +252,16 @@ elif page == "Song Analysis":
         )
 
     # Scatter plot
+    scatter_data = filtered.dropna(subset=[x_feature, y_feature])
+    size_col = "popularity" if scatter_data["popularity"].notna().all() else None
     fig = px.scatter(
-        filtered,
+        scatter_data,
         x=x_feature,
         y=y_feature,
         color="album_name",
         color_discrete_map=album_color_map,
         hover_data=["track_name", "album_name", "popularity"],
-        size="popularity",
+        size=size_col,
         size_max=15,
         trendline="ols",
         labels={"album_name": "Album"},
@@ -528,7 +530,7 @@ elif page == "Album Analysis":
             st.markdown(f"- **Avg Danceability**: {album_tracks['danceability'].mean():.2f}")
             st.markdown(f"- **Singles**: {album_tracks['is_single'].sum()}")
             st.markdown(f"- **Collabs**: {album_tracks['is_collaboration'].sum()}")
-            if album_tracks.get("album_image") is not None:
+            if "album_image" in album_tracks.columns:
                 img = album_tracks["album_image"].iloc[0]
                 if pd.notna(img):
                     st.image(img, width=200)

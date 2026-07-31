@@ -68,13 +68,13 @@ def load_spotify_data() -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-def load_kworb_streams() -> dict[str, int]:
-    """Load Kworb stream counts. Returns dict of track_name_lower -> streams."""
+def load_kworb_streams() -> tuple[dict[str, int], dict[str, int]]:
+    """Load Kworb stream counts. Returns (streams_by_name, streams_by_id)."""
     path = DATA_RAW / "kworb_streams.json"
     if not path.exists():
         print(f"WARNING: {path} not found. Run scripts/fetch_streams.py first.")
         print("Falling back to Spotify popularity scores only.")
-        return {}
+        return {}, {}
 
     with open(path) as f:
         raw = json.load(f)

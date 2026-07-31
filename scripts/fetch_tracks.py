@@ -39,7 +39,7 @@ def fetch_album_tracks(sp, album_id: str) -> list[dict]:
     return tracks
 
 
-def fetch_audio_features_freqblog(track_name: str, artist: str = "Ariana Grande") -> dict | None:
+def fetch_audio_features_freqblog(track_name: str, artist: str = "Ariana Grande", _retries: int = 3) -> dict | None:
     """Fetch audio features from FreqBlog API (free Spotify audio_features replacement)."""
     api_key = os.getenv("FREQBLOG_API_KEY")
     if not api_key:
@@ -73,10 +73,13 @@ def fetch_audio_features_freqblog(track_name: str, artist: str = "Ariana Grande"
                 "_source": "freqblog",
             }
         elif resp.status_code == 429:
+            if _retries <= 0:
+                print(f"    Rate limit retries exhausted for '{track_name}'")
+                return None
             retry_after = int(resp.headers.get("Retry-After", 5))
             print(f"    Rate limited, waiting {retry_after}s...")
             time.sleep(retry_after)
-            return fetch_audio_features_freqblog(track_name, artist)
+            return fetch_audio_features_freqblog(track_name, artist, _retries - 1)
         else:
             print(f"    FreqBlog {resp.status_code} for '{track_name}'")
             return None
@@ -96,7 +99,8 @@ def fetch_audio_features_spotify(sp, track_ids: list[str]) -> list[dict | None]:
             time.sleep(0.1)
     except Exception as e:
         print(f"  Spotify audio_features unavailable (expected for new apps): {e}")
-        return [None] * len(track_ids)
+        # Pad remaining with None so length matches track_ids
+        all_features.extend([None] * (len(track_ids) - len(all_features)))
     return all_features
 
 

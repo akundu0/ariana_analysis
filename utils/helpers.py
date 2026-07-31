@@ -85,7 +85,6 @@ KNOWN_SINGLES = {
         "the way",
         "baby i",
         "right there",
-        "problem",
     ],
     "My Everything": [
         "problem",
