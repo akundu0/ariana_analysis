@@ -1,0 +1,13 @@
+.env
+__pycache__/
+*.pyc
+data/raw/
+data/processed/
+.cache
+.cache-*
+.spotipy_cache
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
